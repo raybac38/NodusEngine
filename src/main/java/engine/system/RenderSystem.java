@@ -1,4 +1,4 @@
-package engine.core;
+package engine.system;
 
 import engine.component.Mesh;
 import engine.core.window.Window;
@@ -11,13 +11,13 @@ import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
-public class Render {
+public class RenderSystem {
 	private final List<Mesh> meshs = new ArrayList<>();
 	private final long window;
 	private int defaultShaderProgram;
 
 
-	public Render(Window window) {
+	public RenderSystem(Window window) {
 		GL.createCapabilities();
 		createDefaultShaderProgram();
 		this.window = window.getWindow();
