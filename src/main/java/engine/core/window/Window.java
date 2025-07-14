@@ -8,9 +8,20 @@ public interface Window {
 	void setWindowMouseListener(WindowMouseListener windowMouseListener);
 
 	/*
-	Kill the current windows
+		Kill the current windows
 	 */
 	void kill();
+
+	/*
+		Does the current windows have been killed
+	 */
+	boolean isKilled();
+
+	/*
+		Terminate the current window context
+	 */
+	void terminate();
+
 
 	/*
 	Update what the windows show

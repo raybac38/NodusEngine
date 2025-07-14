@@ -1,4 +1,4 @@
-package engine.component;
+package engine.ecs.component;
 
 public interface Component {
 }

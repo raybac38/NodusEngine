@@ -2,6 +2,7 @@ package engine.core.window;
 
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
+import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryStack;
 
 import java.nio.IntBuffer;
@@ -57,15 +58,24 @@ public class GlfwWindow implements Window {
 		glfwMakeContextCurrent(window);
 		glfwSwapInterval(1);
 		glfwShowWindow(window);
+
+		GL.createCapabilities();
 	}
 
 	@Override
 	public void kill() {
+		this.isKilled = true;
 		glfwSetWindowShouldClose(window, true);
-		closeWindow();
 	}
 
-	private void closeWindow() {
+	@Override
+	public boolean isKilled() {
+		return this.isKilled;
+	}
+
+	@Override
+	public void terminate() {
+		assert (isKilled);
 		glfwFreeCallbacks(window);
 		glfwDestroyWindow(window);
 
@@ -75,10 +85,11 @@ public class GlfwWindow implements Window {
 
 	@Override
 	public void update() {
+		assert (!isKilled);
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 		if (glfwWindowShouldClose(window)) {
-			closeWindow();
+			this.kill();
 		}
 	}
 

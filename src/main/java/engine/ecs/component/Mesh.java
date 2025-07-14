@@ -1,6 +1,6 @@
-package engine.component;
+package engine.ecs.component;
 
-import engine.entity.Entity;
+import engine.ecs.entity.Entity;
 import utils.vector.Vector3;
 
 public class Mesh extends BaseComponent {
@@ -9,6 +9,5 @@ public class Mesh extends BaseComponent {
 
 	public Mesh(Entity owner) {
 		super(owner);
-		owner.scene.render.addMesh(this);
 	}
 }

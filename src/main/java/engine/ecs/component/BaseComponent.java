@@ -1,6 +1,6 @@
-package engine.component;
+package engine.ecs.component;
 
-import engine.entity.Entity;
+import engine.ecs.entity.Entity;
 
 public abstract class BaseComponent implements Component {
 	protected final Entity owner;

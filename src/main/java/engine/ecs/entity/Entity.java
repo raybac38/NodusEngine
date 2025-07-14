@@ -1,10 +1,11 @@
-package engine.entity;
+package engine.ecs.entity;
 
-import engine.component.Component;
-import engine.component.Transform;
 import engine.core.Scene;
+import engine.ecs.component.Component;
+import engine.ecs.component.Transform;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class Entity {
@@ -31,7 +32,6 @@ public class Entity {
 		return null;
 	}
 
-
 	/*
 		Attaching a new components to this entity
 	 */
@@ -39,6 +39,26 @@ public class Entity {
 		assert (!components.contains(component));
 		assert (!(component instanceof Transform));
 		components.add(component);
+		scene.notifyAddedComponent(component);
 	}
+
+	/*
+		Remove a components to this entity
+		return the removed components
+	 */
+	public <T extends Component> T removeComponent(Class<T> type) {
+		assert (type != null);
+		Iterator<Component> iterator = components.iterator();
+		while (iterator.hasNext()) {
+			Component component = iterator.next();
+			if (type.isInstance(component)) {
+				iterator.remove();
+				scene.notifyRemovedComponent(component);
+				return type.cast(component);
+			}
+		}
+		return null;
+	}
+
 
 }

@@ -1,8 +1,7 @@
-package engine.system;
+package engine.ecs.system;
 
-import engine.component.Mesh;
-import engine.core.window.Window;
-import org.lwjgl.opengl.GL;
+import engine.ecs.component.Component;
+import engine.ecs.component.Mesh;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,16 +10,29 @@ import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
-public class RenderSystem {
+public class RenderSystem implements System {
 	private final List<Mesh> meshs = new ArrayList<>();
-	private final long window;
 	private int defaultShaderProgram;
 
-
-	public RenderSystem(Window window) {
-		GL.createCapabilities();
+	public RenderSystem() {
 		createDefaultShaderProgram();
-		this.window = window.getWindow();
+	}
+
+	/*
+		Méthode is called by the scene to update and draw
+	 */
+	public void update() {
+		render();
+	}
+
+	@Override
+	public void notifyAddedComponent(Component component) {
+		if (component instanceof Mesh) meshs.add((Mesh) component);
+	}
+
+	@Override
+	public void notifyRemovedComponent(Component component) {
+		if (component instanceof Mesh) meshs.remove((Mesh) component);
 	}
 
 	/*
@@ -62,15 +74,8 @@ public class RenderSystem {
 		glDeleteShader(fragmentShader);
 	}
 
-	public void addMesh(Mesh mesh) {
-		meshs.add(mesh);
-	}
+	private void render() {
 
-	public void removeMesh(Mesh mesh) {
-		meshs.remove(mesh);
-	}
-
-	public void render() {
 		glClearColor(0.2f, 0.3f, 1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glUseProgram(defaultShaderProgram);
@@ -78,11 +83,11 @@ public class RenderSystem {
 			if (mesh.vertices == null) return;
 			int vbo = glGenBuffers();
 			glBindBuffer(GL_ARRAY_BUFFER, vbo);
-			float[] vertices = new float[mesh.vertices.length];
-			for (int i = 0; i < vertices.length; i++) {
+			float[] vertices = new float[mesh.vertices.length * 3];
+			for (int i = 0; i < mesh.vertices.length; i++) {
 				vertices[i * 3] = mesh.vertices[i].x;
-				vertices[i * 3] = mesh.vertices[i].y;
-				vertices[i * 3 + 1] = mesh.vertices[i].z;
+				vertices[i * 3 + 1] = mesh.vertices[i].y;
+				vertices[i * 3 + 2] = mesh.vertices[i].z;
 			}
 			glBufferData(GL_ARRAY_BUFFER, vertices, GL_STREAM_DRAW);
 
