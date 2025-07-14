@@ -3,12 +3,14 @@ package engine.core;
 import engine.ecs.component.Component;
 import engine.ecs.entity.Entity;
 import engine.ecs.system.RenderSystem;
+import engine.ecs.system.ScriptSystem;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Scene {
 	private final SceneManager sceneManager;
+	private final ScriptSystem scriptSystem = new ScriptSystem();
 	private final RenderSystem renderSystem;
 	private final List<Entity> entities = new ArrayList<>();
 
@@ -32,11 +34,13 @@ public class Scene {
 		if (!addedComponents.isEmpty()) {
 			for (Component component : addedComponents) {
 				renderSystem.notifyAddedComponent(component);
+				scriptSystem.notifyAddedComponent(component);
 			}
 		}
 		if (!removedComponents.isEmpty()) {
 			for (Component component : removedComponents) {
 				renderSystem.notifyRemovedComponent(component);
+				scriptSystem.notifyRemovedComponent(component);
 			}
 		}
 		addedComponents.clear();
@@ -45,6 +49,7 @@ public class Scene {
 
 	public void update() {
 		handleComponentsNotification();
+		scriptSystem.update();
 		renderSystem.update();
 	}
 

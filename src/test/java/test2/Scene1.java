@@ -11,5 +11,6 @@ public class Scene1 extends Scene {
 
 		Entity entity = new Entity(this);
 		entity.addComponent(new Mesh1(entity));
+		entity.addComponent(new Script1(entity));
 	}
 }
