@@ -10,12 +10,5 @@ public class Core {
 		this.window = window;
 		this.sceneManager = sceneManager;
 	}
-
-	public void loop() {
-		while (!window.isKilled()) {
-			sceneManager.update();
-			window.update();
-		}
-		window.terminate();
-	}
+	
 }

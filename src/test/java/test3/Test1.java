@@ -1,4 +1,4 @@
-package test2;
+package test3;
 
 import engine.core.Core;
 import engine.core.SceneManager;
@@ -16,7 +16,7 @@ public class Test1 {
 		while (!window.isKilled()) {
 			sceneManager.update();
 			window.update();
-			Thread.sleep(100);
+			Thread.sleep(10);
 		}
 		window.terminate();
 	}

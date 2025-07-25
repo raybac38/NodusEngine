@@ -8,4 +8,8 @@ public abstract class BaseComponent implements Component {
 	BaseComponent(Entity owner) {
 		this.owner = owner;
 	}
+
+	public Entity getOwner() {
+		return owner;
+	}
 }

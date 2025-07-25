@@ -86,8 +86,8 @@ public class GlfwWindow implements Window {
 	@Override
 	public void update() {
 		assert (!isKilled);
-		glfwSwapBuffers(window);
 		glfwPollEvents();
+		glfwSwapBuffers(window);
 		if (glfwWindowShouldClose(window)) {
 			this.kill();
 		}

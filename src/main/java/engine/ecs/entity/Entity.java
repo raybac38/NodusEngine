@@ -10,8 +10,8 @@ import java.util.List;
 
 public class Entity {
 	public final Scene scene;
-	private final List<Component> components = new ArrayList<>();
-	private final Component transform = new Transform(this);
+	public final Transform transform = new Transform(this);
+	public final List<Component> components = new ArrayList<>();
 
 	public Entity(Scene scene) {
 		this.scene = scene;

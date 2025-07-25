@@ -22,6 +22,5 @@ public class SceneManager {
 
 	public void update() {
 		currentScene.update();
-		window.update();
 	}
 }
