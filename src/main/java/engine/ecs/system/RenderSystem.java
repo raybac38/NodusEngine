@@ -3,8 +3,12 @@ package engine.ecs.system;
 import engine.ecs.component.Camera;
 import engine.ecs.component.Component;
 import engine.ecs.component.Mesh;
+import engine.ecs.component.Transform;
 import utils.vector.Vector3;
 
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,32 +49,118 @@ public class RenderSystem implements System {
 		if (component instanceof Camera) mainCamera = null;
 	}
 
+
+	private float[] multiplyMatrix(float[] matrixA, float[] matrixB) {
+		assert (matrixA != null && matrixB != null);
+		int length = (int) Math.sqrt(matrixA.length);
+		assert (length * length == matrixA.length);
+
+		float[] res = new float[matrixA.length];
+
+		for (int row = 0; row < length; row++) {
+			for (int col = 0; col < length; col++) {
+				float sum = 0;
+				for (int k = 0; k < length; k++) {
+					sum += matrixA[row * length + k] * matrixB[k * length + col];
+				}
+				res[row * length + col] = sum;
+			}
+		}
+		return res;
+	}
+
+	private float[] rotationMatrixInv(Vector3 angle) {
+		float cosX = (float) Math.cos(Math.toRadians(angle.x));
+		float sinX = (float) Math.sin(Math.toRadians(angle.x));
+
+		float[] rotationX = new float[]{
+				1f, 0f, 0f, 0f,
+				0f, cosX, sinX, 0f,
+				0f, sinX * -1f, cosX, 0f,
+				0f, 0f, 0f, 1f};
+
+		float cosY = (float) Math.cos(Math.toRadians(angle.y));
+		float sinY = (float) Math.sin(Math.toRadians(angle.y));
+
+		float[] rotationY = new float[]{
+				cosY, 0f, sinY * -1f, 0f,
+				0f, 1f, 0f, 0f,
+				sinY, 0f, cosY, 0f,
+				0f, 0f, 0f, 1f};
+
+		float cosZ = (float) Math.cos(Math.toRadians(angle.z));
+		float sinZ = (float) Math.sin(Math.toRadians(angle.z));
+
+		float[] rotationZ = new float[]{
+				cosZ, sinZ, 0f, 0f,
+				-1f * sinZ, cosZ, 0f, 0f,
+				0f, 0f, 1f, 0f,
+				0f, 0f, 0f, 1f};
+
+		return multiplyMatrix(rotationX, multiplyMatrix(rotationY, rotationZ));
+	}
+
+	private float[] rotationMatrix(Vector3 angle) {
+		float cosX = (float) Math.cos(Math.toRadians(angle.x));
+		float sinX = (float) Math.sin(Math.toRadians(angle.x));
+
+		float[] rotationX = new float[]{
+				1f, 0f, 0f, 0f,
+				0f, cosX, -1f * sinX, 0f,
+				0f, sinX, cosX, 0f,
+				0f, 0f, 0f, 1f};
+
+		float cosY = (float) Math.cos(Math.toRadians(angle.y));
+		float sinY = (float) Math.sin(Math.toRadians(angle.y));
+
+		float[] rotationY = new float[]{
+				cosY, 0f, sinY, 0f,
+				0f, 1f, 0f, 0f,
+				-1f * sinY, 0f, cosY, 0f,
+				0f, 0f, 0f, 1f};
+
+		float cosZ = (float) Math.cos(Math.toRadians(angle.z));
+		float sinZ = (float) Math.sin(Math.toRadians(angle.z));
+
+		float[] rotationZ = new float[]{
+				cosZ, -1f * sinZ, 0f, 0f,
+				sinZ, cosZ, 0f, 0f,
+				0f, 0f, 1f, 0f,
+				0f, 0f, 0f, 1f};
+
+		return multiplyMatrix(rotationZ, multiplyMatrix(rotationY, rotationX));
+	}
+
+	private float[] computeViewMatrix(Transform transform) {
+		Vector3 position = transform.getPosition();
+		float[] translationMatrix = new float[]{
+				1f, 0f, 0f, 0f,
+				0f, 1f, 0f, 0f,
+				0f, 0f, 1f, 0f,
+				position.x * -1f, position.y * -1f, position.z * -1f, 1f};
+
+		Vector3 angle = transform.getRotation();
+
+		return multiplyMatrix(rotationMatrixInv(angle), translationMatrix);
+	}
+
 	/*
 		Create the defaultShaderProgram saved in this variable
 	 */
 	private void createDefaultShaderProgram() {
-		String vertexShaderCode = """
-				      #version 330 core      \s
-				      layout (location = 0) in vec3 aPos;
-				      uniform mat4 projection;
-				      uniform mat4 view;
-				      uniform mat4 model;
-				      void main()      \s
-				      {         \s
-					   gl_Position = projection * view * model * vec4(aPos, 1.0);
-				}""";
+		String vertexShaderCode;
+		String fragmentShaderCode;
+		try {
+			vertexShaderCode = Files.readString(Path.of("src/main/resources/shaders/defaultVertexShader.vert"), StandardCharsets.UTF_8);
+			fragmentShaderCode = Files.readString(Path.of("src/main/resources/shaders/defaultFragmentShader.frag"), StandardCharsets.UTF_8);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 
 		vertexShader = glCreateShader(GL_VERTEX_SHADER);
 		glShaderSource(vertexShader, vertexShaderCode);
 		glCompileShader(vertexShader);
 
-		String fragmentShaderCode = """
-				#version 330 core      \s
-				out vec4 FragColor;             \s
-				void main() \s
-				{          \s
-				 FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);      \s
-				}""";
 		fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 		glShaderSource(fragmentShader, fragmentShaderCode);
 		glCompileShader(fragmentShader);
@@ -112,15 +202,8 @@ public class RenderSystem implements System {
 		};
 		glUniformMatrix4fv(projectionLoc, false, projectionMatrix);
 
-		Vector3 cameraPosition = mainCamera.getOwner().transform.getPosition();
-
 		int viewLoc = glGetUniformLocation(defaultShaderProgram, "view");
-		float[] viewMatrix = new float[]{
-				1, 0, 0, 0,
-				0, 1, 0, 0,
-				0, 0, 1, 0,
-				cameraPosition.x * -1, cameraPosition.y * -1, cameraPosition.z * -1, 1
-		};
+		float[] viewMatrix = computeViewMatrix(mainCamera.getOwner().transform);
 		glUniformMatrix4fv(viewLoc, false, viewMatrix);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
