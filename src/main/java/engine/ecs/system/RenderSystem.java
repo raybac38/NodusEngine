@@ -144,6 +144,19 @@ public class RenderSystem implements System {
 		return multiplyMatrix(rotationMatrixInv(angle), translationMatrix);
 	}
 
+	private float[] computeModelMatrix(Transform transform) {
+		Vector3 position = transform.getPosition();
+		float[] translationMatrix = new float[]{
+				1f, 0f, 0f, 0f,
+				0f, 1f, 0f, 0f,
+				0f, 0f, 1f, 0f,
+				position.x, position.y, position.z, 1f};
+
+		Vector3 angle = transform.getRotation();
+
+		return multiplyMatrix(translationMatrix, rotationMatrix(angle));
+	}
+
 	/*
 		Create the defaultShaderProgram saved in this variable
 	 */
@@ -185,7 +198,7 @@ public class RenderSystem implements System {
 
 		glUseProgram(defaultShaderProgram);
 
-		float aspectRatio = 1.3f;
+		float aspectRatio = 16f / 9f;
 		float fov = mainCamera.fov;
 		float far = mainCamera.far;
 		float near = mainCamera.near;
@@ -210,17 +223,10 @@ public class RenderSystem implements System {
 		for (Mesh mesh : meshs) {
 			if (mesh.vertices == null) continue;
 
-			Vector3 meshPosition = mesh.getOwner().transform.getPosition();
-
+			Transform meshTransform = mesh.getOwner().transform;
 			int modelLoc = glGetUniformLocation(defaultShaderProgram, "model");
-			float[] modelMatrix = new float[]
-					{1, 0, 0, 0,
-							0, 1, 0, 0,
-							0, 0, 1, 0,
-							meshPosition.x, meshPosition.y, meshPosition.z, 1};
-			glUniformMatrix4fv(modelLoc, false, modelMatrix);
-
-
+			glUniformMatrix4fv(modelLoc, false, computeModelMatrix(meshTransform));
+			
 			int vbo = glGenBuffers();
 			glBindBuffer(GL_ARRAY_BUFFER, vbo);
 			float[] vertices = new float[mesh.vertices.length * 3];

@@ -37,5 +37,5 @@ public interface Window {
 	interface WindowMouseListener {
 		void mouseMoved(Window window, double offsetX, double offsetY);
 	}
-
+	
 }

@@ -3,6 +3,7 @@ package engine.core.window;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.system.MemoryStack;
 
 import java.nio.IntBuffer;
@@ -60,6 +61,10 @@ public class GlfwWindow implements Window {
 		glfwShowWindow(window);
 
 		GL.createCapabilities();
+
+		glfwSetFramebufferSizeCallback(window, (win, w, h) -> {
+			GL11.glViewport(0, 0, w, h);
+		});
 	}
 
 	@Override
