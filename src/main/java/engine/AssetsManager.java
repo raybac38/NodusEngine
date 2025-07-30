@@ -18,25 +18,59 @@ public class AssetsManager {
 		try {
 			MeshData meshData = ObjectParser.parse(new FileInputStream(filename));
 
-			/// Transform List<float[]> into Vector3[]
-			List<float[]> vertices = meshData.getVertices();
-			int verticesLength = vertices.size();
-			targetMesh.vertices = new Vector3[verticesLength];
-			for (int i = 0; i < verticesLength; i++) {
-				float[] point = vertices.get(i);
-				targetMesh.vertices[i] = new Vector3(point[0], point[1], point[2]);
+			List<float[]> objectVertices = meshData.getVertices();
+			List<float[]> objectNormals = meshData.getNormal();
+			List<float[]> objectUvs = meshData.getUV();
+
+			List<FaceData> faceDataList = meshData.getFaces();
+			int verticesNumber = faceDataList.size() * 3;
+
+			int meshVerticesInsertionIndex = 0;
+			Vector3[] meshVertices = new Vector3[verticesNumber];
+			int meshNormalsInsertionIndex = 0;
+			Vector3[] meshNormals = new Vector3[verticesNumber];
+			int meshUvsInsertionIndex = 0;
+			Vector3[] meshUvs = new Vector3[verticesNumber];
+
+			for (FaceData faceData : faceDataList) {
+				/// Vertices
+				int[] objectVerticesIndex = faceData.getVerticesIndex();
+				float[] coordinateA = objectVertices.get(objectVerticesIndex[0] - 1);
+				meshVertices[meshVerticesInsertionIndex++] = new Vector3(coordinateA);
+				float[] coordinateB = objectVertices.get(objectVerticesIndex[1] - 1);
+				meshVertices[meshVerticesInsertionIndex++] = new Vector3(coordinateB);
+				float[] coordinateC = objectVertices.get(objectVerticesIndex[2] - 1);
+				meshVertices[meshVerticesInsertionIndex++] = new Vector3(coordinateC);
+
+				/// Normals
+				int[] objectNormalsIndex = faceData.getNormalIndex();
+				float[] normalsA = objectNormals.get(objectNormalsIndex[0] - 1);
+				meshNormals[meshNormalsInsertionIndex++] = new Vector3(normalsA);
+				float[] normalsB = objectNormals.get(objectNormalsIndex[1] - 1);
+				meshNormals[meshNormalsInsertionIndex++] = new Vector3(normalsB);
+				float[] normalsC = objectNormals.get(objectNormalsIndex[2] - 1);
+				meshNormals[meshNormalsInsertionIndex++] = new Vector3(normalsC);
+
+				/// Uvs
+				int[] objectUvsIndex = faceData.getUVIndex();
+				float[] uvA = objectUvs.get(objectUvsIndex[0] - 1);
+				meshUvs[meshUvsInsertionIndex++] = new Vector3(uvA);
+				float[] uvB = objectUvs.get(objectUvsIndex[1] - 1);
+				meshUvs[meshUvsInsertionIndex++] = new Vector3(uvB);
+				float[] uvC = objectUvs.get(objectUvsIndex[2] - 1);
+				meshUvs[meshUvsInsertionIndex++] = new Vector3(uvC);
 			}
 
-			///  adding triangles
-			List<FaceData> faces = meshData.getFaces();
-			int facesLength = faces.size();
-			targetMesh.triangles = new int[facesLength * 3];
-			for (int i = 0; i < facesLength; i++) {
-				int[] face = faces.get(i).getVerticesIndex();
-				targetMesh.triangles[i * 3] = face[0] - 1;
-				targetMesh.triangles[i * 3 + 1] = face[1] - 1;
-				targetMesh.triangles[i * 3 + 2] = face[2] - 1;
+			targetMesh.vertices = meshVertices;
+			targetMesh.normals = meshNormals;
+			targetMesh.uvs = meshUvs;
+
+			int[] triangles = new int[verticesNumber];
+			for (int i = 0; i < verticesNumber; i++) {
+				triangles[i] = i;
 			}
+			targetMesh.triangles = triangles;
+
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

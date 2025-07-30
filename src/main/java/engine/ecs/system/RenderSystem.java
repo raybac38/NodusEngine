@@ -226,22 +226,40 @@ public class RenderSystem implements System {
 			Transform meshTransform = mesh.getOwner().transform;
 			int modelLoc = glGetUniformLocation(defaultShaderProgram, "model");
 			glUniformMatrix4fv(modelLoc, false, computeModelMatrix(meshTransform));
-			
+
 			int vbo = glGenBuffers();
 			glBindBuffer(GL_ARRAY_BUFFER, vbo);
-			float[] vertices = new float[mesh.vertices.length * 3];
+			int vertexSize = 3 + 3 + 2; // 3 for coordinate, 3 for normals, 2 for uv
+			float[] verticesData = new float[mesh.vertices.length * vertexSize];
 			for (int i = 0; i < mesh.vertices.length; i++) {
-				vertices[i * 3] = mesh.vertices[i].x;
-				vertices[i * 3 + 1] = mesh.vertices[i].y;
-				vertices[i * 3 + 2] = mesh.vertices[i].z;
+				verticesData[i * vertexSize] = mesh.vertices[i].x;
+				verticesData[i * vertexSize + 1] = mesh.vertices[i].y;
+				verticesData[i * vertexSize + 2] = mesh.vertices[i].z;
+				verticesData[i * vertexSize + 3] = mesh.normals[i].x;
+				verticesData[i * vertexSize + 4] = mesh.normals[i].y;
+				verticesData[i * vertexSize + 5] = mesh.normals[i].z;
+				verticesData[i * vertexSize + 6] = mesh.uvs[i].x;
+				verticesData[i * vertexSize + 7] = mesh.uvs[i].y;
 			}
-			glBufferData(GL_ARRAY_BUFFER, vertices, GL_STREAM_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, verticesData, GL_STREAM_DRAW);
 
 			int vao = glGenVertexArrays();
 
+			int vertexSizeBytes = vertexSize * Float.BYTES;
 			glBindVertexArray(vao);
-			glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0L);
+
+			// Position
+			glVertexAttribPointer(0, 3, GL_FLOAT, false, vertexSizeBytes, 0L);
 			glEnableVertexAttribArray(0);
+
+			// Normale
+			glVertexAttribPointer(1, 3, GL_FLOAT, false, vertexSizeBytes, 3 * Float.BYTES);
+			glEnableVertexAttribArray(1);
+
+			// UV
+			glVertexAttribPointer(2, 2, GL_FLOAT, false, vertexSizeBytes, 6 * Float.BYTES);
+			glEnableVertexAttribArray(2);
+
 
 			int ebo = glGenBuffers();
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);

@@ -15,6 +15,21 @@ public class Vector3 {
 		this.z = z;
 	}
 
+	public Vector3(float[] coordinate) {
+		assert (coordinate != null);
+		switch (coordinate.length) {
+			case 3:
+				this.z = coordinate[2];
+			case 2:
+				this.y = coordinate[1];
+			case 1:
+				this.x = coordinate[0];
+				break;
+			default:
+				throw new RuntimeException("Vector3 constructor : coordinate out of bound");
+		}
+	}
+
 	public Vector3 add(Vector3 vector3) {
 		return new Vector3(x + vector3.x, y + vector3.y, z + vector3.z);
 	}
