@@ -1,7 +1,6 @@
 package engine.core;
 
 import engine.core.window.Window;
-import engine.ecs.system.RenderSystem;
 
 public class SceneManager {
 	private final Window window;
@@ -15,9 +14,10 @@ public class SceneManager {
 		return window;
 	}
 
-	public void loadScene(String sceneName) {
-		RenderSystem renderSystem = new RenderSystem();
-		this.currentScene = new Scene(this, renderSystem);
+	public void loadScene(Scene scene) {
+		scene.sceneManager = this;
+		scene.isActivated = true;
+		this.currentScene = scene;
 	}
 
 	public void update() {

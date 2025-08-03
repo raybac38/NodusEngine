@@ -9,18 +9,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Scene {
-	private final SceneManager sceneManager;
-	private final ScriptSystem scriptSystem = new ScriptSystem();
-	private final RenderSystem renderSystem;
 	private final List<Entity> entities = new ArrayList<>();
-
 	private final List<Component> addedComponents = new ArrayList<>();
 	private final List<Component> removedComponents = new ArrayList<>();
-
-	public Scene(SceneManager sceneManager, RenderSystem renderSystem) {
-		this.sceneManager = sceneManager;
-		this.renderSystem = renderSystem;
-	}
+	private final ScriptSystem scriptSystem = new ScriptSystem();
+	private final RenderSystem renderSystem = new RenderSystem();
+	SceneManager sceneManager;
+	boolean isActivated = false;
 
 	public void notifyAddedComponent(Component component) {
 		addedComponents.add(component);

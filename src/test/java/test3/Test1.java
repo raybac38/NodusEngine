@@ -8,8 +8,8 @@ import engine.core.window.Window;
 public class Test1 {
 	public static void main(String[] args) throws InterruptedException {
 		Window window = new GlfwWindow();
-		SceneManager sceneManager = new SceneManager1(window);
-		sceneManager.loadScene("f");
+		SceneManager sceneManager = new SceneManager(window);
+		sceneManager.loadScene(new Scene1());
 
 		Core core = new Core(sceneManager, window);
 
