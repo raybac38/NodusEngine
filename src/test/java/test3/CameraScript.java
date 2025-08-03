@@ -13,7 +13,17 @@ public class CameraScript extends Script {
 	}
 
 	@Override
-	public void update() {
+	public void onUpdate() {
 		owner.transform.setPosition(new Vector3(0, 0, offset));
+	}
+
+	@Override
+	public void onStart() {
+
+	}
+
+	@Override
+	public void onStop() {
+
 	}
 }

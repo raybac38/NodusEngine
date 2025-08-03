@@ -16,16 +16,21 @@ public class Script1 extends Script {
 	}
 
 	@Override
-	public void update() {
-		if (!triggered) {
-			triggered = true;
-			mesh = owner.getComponent(Mesh.class);
-			AssetsManager.loadMesh(mesh, "src/test/resources/obj/ico.obj");
-			System.out.println("loading effectuer");
-		}
-
+	public void onUpdate() {
 		tick++;
-
 		owner.transform.setRotation(new Vector3(tick, tick, 0));
+	}
+
+	@Override
+	public void onStart() {
+		triggered = true;
+		mesh = owner.getComponent(Mesh.class);
+		AssetsManager.loadMesh(mesh, "src/test/resources/obj/ico.obj");
+		System.out.println("loading effectuer");
+	}
+
+	@Override
+	public void onStop() {
+
 	}
 }
