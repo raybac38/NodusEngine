@@ -7,8 +7,8 @@ import engine.ecs.entity.Entity;
 import utils.vector.Vector3;
 
 public class Script1 extends Script {
+	private final boolean triggered = false;
 	private Mesh mesh;
-	private boolean triggered = false;
 	private int tick;
 
 	public Script1(Entity owner) {
@@ -23,7 +23,7 @@ public class Script1 extends Script {
 
 	@Override
 	public void onStart() {
-		triggered = true;
+		System.out.println("hhh");
 		mesh = owner.getComponent(Mesh.class);
 		AssetsManager.loadMesh(mesh, "src/test/resources/obj/ico.obj");
 		System.out.println("loading effectuer");

@@ -14,15 +14,19 @@ public class ScriptSystem implements System {
 
 	@Override
 	public void update() {
+		java.lang.System.out.println("update");
 
 		/// Updating all script
 		for (Script script : scriptToStop) {
+			java.lang.System.out.println("all stop script");
 			script.onStop();
 		}
 		for (Script script : scriptsToStart) {
+			java.lang.System.out.println("all start script");
 			script.onStart();
 		}
 		for (Script script : scriptsToUpdate) {
+			java.lang.System.out.println("all update script");
 			script.onUpdate();
 		}
 

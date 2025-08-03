@@ -8,7 +8,7 @@ import engine.ecs.system.ScriptSystem;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Scene {
+public abstract class Scene {
 	private final List<Entity> entities = new ArrayList<>();
 	private final List<Component> addedComponents = new ArrayList<>();
 	private final List<Component> removedComponents = new ArrayList<>();
@@ -16,6 +16,10 @@ public class Scene {
 	private final RenderSystem renderSystem = new RenderSystem();
 	SceneManager sceneManager;
 	boolean isActivated = false;
+
+	protected Scene() {
+		init();
+	}
 
 	public void notifyAddedComponent(Component component) {
 		addedComponents.add(component);
@@ -55,6 +59,8 @@ public class Scene {
 	public void removeEntity(Entity entity) {
 		entities.remove(entity);
 	}
+
+	protected abstract void init();
 
 
 }

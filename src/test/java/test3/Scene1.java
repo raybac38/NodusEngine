@@ -5,8 +5,9 @@ import engine.ecs.component.Camera;
 import engine.ecs.entity.Entity;
 
 public class Scene1 extends Scene {
-	public Scene1() {
-		super();
+	
+	@Override
+	protected void init() {
 		Entity entity = new Entity(this);
 		entity.addComponent(new Mesh1(entity));
 		entity.addComponent(new Script1(entity));
