@@ -17,7 +17,7 @@ import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
 public class RenderSystem implements System {
-	private final List<Mesh> meshs = new ArrayList<>();
+	private final List<Mesh> meshes = new ArrayList<>();
 	private Camera mainCamera;
 	private int defaultShaderProgram;
 
@@ -39,13 +39,13 @@ public class RenderSystem implements System {
 
 	@Override
 	public void notifyAddedComponent(Component component) {
-		if (component instanceof Mesh) meshs.add((Mesh) component);
+		if (component instanceof Mesh) meshes.add((Mesh) component);
 		if (component instanceof Camera) mainCamera = (Camera) component;
 	}
 
 	@Override
 	public void notifyRemovedComponent(Component component) {
-		if (component instanceof Mesh) meshs.remove((Mesh) component);
+		if (component instanceof Mesh) meshes.remove((Mesh) component);
 		if (component instanceof Camera) mainCamera = null;
 	}
 
@@ -222,7 +222,7 @@ public class RenderSystem implements System {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glEnable(GL_DEPTH_TEST);
-		for (Mesh mesh : meshs) {
+		for (Mesh mesh : meshes) {
 			if (mesh.vertices == null) continue;
 
 			Transform meshTransform = mesh.getOwner().transform;
